@@ -6,12 +6,12 @@ export const createPost=async(req,res,next)=>{
     try {
         const user=req.user;
         const {title,body,active,lat,long}=req.body;
-        if(!title||!body||!lat||!long)return next(new CustomError("fields required"),400,{
+        if(!title||!body||!lat||!long)return next(new CustomError("fields required",400,{
             ...(!title&&({title:"title is required..."})),
             ...(!body&&({body:"body is required..."})),
             ...(!lat&&({lat:"lat is required..."})),
             ...(!long&&({long:"long is required..."})),
-        })
+        }))
         const data=await postSchema.create({
          title,
          body,
@@ -110,10 +110,10 @@ export const getActive=async(req,res,next)=>{
 export const getPostByLocation=async(req,res,next)=>{
     try {
         const {long,lat}=req.body
-        if(!lat||!long)return next(new CustomError("fields required"),400,{
+        if(!lat||!long)return next(new CustomError("fields required",400,{
             ...(!lat&&({lat:"lat is required..."})),
             ...(!long&&({long:"long is required..."})),
-        })
+        }))
         const data=await postSchema.aggregate([
             {
                 $geoNear:{

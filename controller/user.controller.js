@@ -48,11 +48,16 @@ export const passportVarifier=()=>{
 export const userRegister=async (req, res, next) => {
     try {
         const { name, email, password } = req.body;
-        if(!name||!email||!password)return next(new CustomError("fields required"),400,{
+        console.log({
             ...(!name&&({name:"name is required..."})),
-            ...(!email&&({name:"email is required..."})),
-            ...(!password&&({name:"password is required..."})),
+            ...(!email&&({email:"email is required..."})),
+            ...(!password&&({password:"password is required..."})),
         })
+        if(!name||!email||!password)return next(new CustomError("fields required",400,{
+            ...(!name&&({name:"name is required..."})),
+            ...(!email&&({email:"email is required..."})),
+            ...(!password&&({password:"password is required..."})),
+        }))
         const hashedPassword = await bcrypt.hash(password, 10);
         await userSchema.create({
             name,
@@ -68,10 +73,10 @@ export const userRegister=async (req, res, next) => {
 }
 export const userLogin=(req, res, next) => {
     const {  email, password } = req.body;
-    if(!email||!password)return next(new CustomError("fields required"),400,{
-        ...(!email&&({name:"email is required..."})),
-        ...(!password&&({name:"password is required..."})),
-    })
+    if(!email||!password)return next(new CustomError("fields required",400,{
+        ...(!email&&({email:"email is required..."})),
+        ...(!password&&({password:"password is required..."})),
+    }))
     passport.authenticate('local', { session: false }, (err, user, info) => {
         if (err) {
             return next(err);
