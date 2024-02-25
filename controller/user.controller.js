@@ -48,7 +48,7 @@ export const passportVarifier=()=>{
 export const userRegister=async (req, res, next) => {
     try {
         const { name, email, password } = req.body;
-        if(!name||!email||!password)return next(CustomError("fields required"),400,{
+        if(!name||!email||!password)return next(new CustomError("fields required"),400,{
             ...(!name&&({name:"name is required..."})),
             ...(!email&&({name:"email is required..."})),
             ...(!password&&({name:"password is required..."})),
@@ -68,7 +68,7 @@ export const userRegister=async (req, res, next) => {
 }
 export const userLogin=(req, res, next) => {
     const {  email, password } = req.body;
-    if(!email||!password)return next(CustomError("fields required"),400,{
+    if(!email||!password)return next(new CustomError("fields required"),400,{
         ...(!email&&({name:"email is required..."})),
         ...(!password&&({name:"password is required..."})),
     })
