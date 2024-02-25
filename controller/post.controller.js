@@ -1,14 +1,17 @@
 import dotenv from "dotenv"
-import epxress from "express"
-import asyncError from "../utils/CustomError/asyncErrorHandler.js"
 import postSchema from "../models/post.schema.js";
-import passport from "passport";
 import CustomError from "../utils/CustomError/CustomError.js";
 dotenv.config()
 export const createPost=async(req,res,next)=>{
     try {
         const user=req.user;
         const {title,body,active,lat,long}=req.body;
+        if(!title||!body||!lat||!long)return next(CustomError("fields required"),400,{
+            ...(!title&&({title:"title is required..."})),
+            ...(!body&&({body:"body is required..."})),
+            ...(!lat&&({lat:"lat is required..."})),
+            ...(!long&&({long:"long is required..."})),
+        })
         const data=await postSchema.create({
          title,
          body,
@@ -49,7 +52,6 @@ export const updatePost= async (req, res, next) => {
         console.log(options)
         const data = await postSchema.findByIdAndUpdate(
            id,{ $set: options }, { new: true });
-        // Add { new: true } to return the updated document
         res.status(200).json({
             message: "Success",
             data
@@ -108,6 +110,10 @@ export const getActive=async(req,res,next)=>{
 export const getPostByLocation=async(req,res,next)=>{
     try {
         const {long,lat}=req.body
+        if(!lat||!long)return next(CustomError("fields required"),400,{
+            ...(!lat&&({lat:"lat is required..."})),
+            ...(!long&&({long:"long is required..."})),
+        })
         const data=await postSchema.aggregate([
             {
                 $geoNear:{

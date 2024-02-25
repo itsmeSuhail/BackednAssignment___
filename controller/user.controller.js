@@ -5,6 +5,7 @@ import passport from "passport";
 import bcrypt from "bcrypt"
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
+import CustomError from "../utils/CustomError/CustomError.js";
 dotenv.config()
 export const passportMiddleWare=()=>{
     passport.use(new LocalStrategy({
@@ -47,13 +48,16 @@ export const passportVarifier=()=>{
 export const userRegister=async (req, res, next) => {
     try {
         const { name, email, password } = req.body;
-        // Hash the password securely
+        if(!name||!email||!password)return next(CustomError("fields required"),400,{
+            ...(!name&&({name:"name is required..."})),
+            ...(!email&&({name:"email is required..."})),
+            ...(!password&&({name:"password is required..."})),
+        })
         const hashedPassword = await bcrypt.hash(password, 10);
-        // Create user in the database
         await userSchema.create({
             name,
             email,
-            password: hashedPassword // Store the hashed password
+            password: hashedPassword
         });
         res.status(200).json({
             message: "User account created successfully"
@@ -63,6 +67,11 @@ export const userRegister=async (req, res, next) => {
     }
 }
 export const userLogin=(req, res, next) => {
+    const {  email, password } = req.body;
+    if(!email||!password)return next(CustomError("fields required"),400,{
+        ...(!email&&({name:"email is required..."})),
+        ...(!password&&({name:"password is required..."})),
+    })
     passport.authenticate('local', { session: false }, (err, user, info) => {
         if (err) {
             return next(err);
